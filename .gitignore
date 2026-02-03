@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+.env
+.env.local
+
+# Dev server is optional, but you can ignore it if you want
+# dev-server.js

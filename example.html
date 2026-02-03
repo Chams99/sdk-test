@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDK Example - One Line Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #2a2438 0%, #352f44 50%, #310a5d 100%);
+            min-height: 100vh;
+            color: #dbd8e3;
+            line-height: 1.6;
+            padding: 40px 20px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .card {
+            background: rgba(53, 47, 68, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(65, 30, 143, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: 0 8px 32px 0 rgba(42, 36, 56, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(65, 30, 143, 0.4);
+            border-color: rgba(65, 30, 143, 0.5);
+            background: rgba(53, 47, 68, 0.5);
+        }
+
+        .code {
+            background: rgba(42, 36, 56, 0.6);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(65, 30, 143, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: 400;
+            margin: 16px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            color: #c4b5fd;
+            line-height: 1.6;
+        }
+
+        .code .comment {
+            color: #6b7280;
+        }
+
+        .code .tag {
+            color: #f472b6;
+        }
+
+        .code .attribute {
+            color: #60a5fa;
+        }
+
+        .code .string {
+            color: #34d399;
+        }
+
+        button {
+            background: rgba(65, 30, 143, 0.4);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            border: 1px solid rgba(65, 30, 143, 0.5);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            margin: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(42, 36, 56, 0.4);
+            letter-spacing: 0.3px;
+        }
+
+        button:hover {
+            background: rgba(65, 30, 143, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(65, 30, 143, 0.5);
+            border-color: rgba(65, 30, 143, 0.7);
+            color: #ffffff;
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(42, 36, 56, 0.3);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 24px 0;
+        }
+
+        #result {
+            padding: 20px;
+            background: rgba(42, 36, 56, 0.6);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(65, 30, 143, 0.3);
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 400;
+            color: #e8e5f0;
+            min-height: 80px;
+            max-height: 600px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        #result pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        /* Custom scrollbar for result box */
+        #result::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #result::-webkit-scrollbar-track {
+            background: rgba(42, 36, 56, 0.3);
+            border-radius: 4px;
+        }
+
+        #result::-webkit-scrollbar-thumb {
+            background: rgba(65, 30, 143, 0.5);
+            border-radius: 4px;
+        }
+
+        #result::-webkit-scrollbar-thumb:hover {
+            background: rgba(65, 30, 143, 0.7);
+        }
+
+        #result:empty::before {
+            content: 'Results will appear here...';
+            color: rgba(219, 216, 227, 0.6);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* Different text states */
+        .result-loading {
+            color: #a8a3b8;
+            font-style: italic;
+        }
+
+        .result-success {
+            color: #4ade80;
+        }
+
+        .result-error {
+            color: #f87171;
+            font-weight: 500;
+        }
+
+        .result-error-title {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .result-json {
+            color: #e8e5f0;
+        }
+
+        .result-json-key {
+            color: #a78bfa;
+        }
+
+        .result-json-string {
+            color: #34d399;
+        }
+
+        .result-json-number {
+            color: #60a5fa;
+        }
+
+        .result-json-boolean {
+            color: #fbbf24;
+        }
+
+        p {
+            margin: 12px 0;
+            color: #dbd8e3;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.7;
+        }
+
+        p strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .card p:first-child {
+            color: #e8e5f0;
+        }
+
+        .card p em {
+            color: #c4b5fd;
+            font-style: italic;
+        }
+
+        code {
+            background: rgba(53, 47, 68, 0.7);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+            font-size: 0.875em;
+            font-weight: 500;
+            color: #e8e5f0;
+            border: 1px solid rgba(65, 30, 143, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 15px;
+                padding: 20px 15px;
+            }
+            h1 {
+                font-size: 2rem;
+                font-weight: 700;
+            }
+            .card {
+                padding: 20px;
+            }
+            p {
+                font-size: 15px;
+            }
+            button {
+                width: calc(50% - 16px);
+                min-width: 120px;
+                font-size: 14px;
+            }
+            .code {
+                font-size: 13px;
+            }
+            #result {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SDK Example</h1>
+        
+        <div class="card">
+            <p><strong>Truly one line</strong> - just like Google Analytics! The SDK auto-initializes and is ready to use immediately.</p>
+            
+            <div class="code">
+                <span class="comment">&lt;!-- ONE LINE: That's it! --&gt;</span><br>
+                <span class="tag">&lt;script</span> <span class="attribute">src</span>=<span class="string">"dist/sdk.min.js?key=YOUR_OPENROUTER_API_KEY"</span><span class="tag">&gt;&lt;/script&gt;</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <p><strong>Note:</strong> The script below is ONLY for this demo page. In your real app, you don't need it!</p>
+        </div>
+
+        <div class="button-container">
+            <button onclick="testChat()">Test Chat</button>
+            <button onclick="testModels()">List Models</button>
+        </div>
+        
+        <div class="card">
+            <div id="result"></div>
+        </div>
+
+        <!-- ONE LINE: Include and auto-initialize SDK (Google Analytics style) -->
+        <!-- This is ALL you need in your HTML! -->
+        <script src="dist/sdk.min.js?key=OPENROUTER_API_KEY"></script>
+        
+        <!-- 
+            The script below is ONLY for this demo page to show the buttons work.
+            In your real app, you can use MySDK directly without any extra script tags!
+            
+            Example usage in your app (no extra script needed):
+            <button onclick="MySDK.chat('Hello').then(console.log)">Chat</button>
+        -->
+        <script>
+            // Helper function to colorize JSON
+            function colorizeJSON(jsonString) {
+                return jsonString
+                    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+                        let cls = 'result-json-number';
+                        if (/^"/.test(match)) {
+                            if (/:$/.test(match)) {
+                                cls = 'result-json-key';
+                            } else {
+                                cls = 'result-json-string';
+                            }
+                        } else if (/true|false/.test(match)) {
+                            cls = 'result-json-boolean';
+                        } else if (/null/.test(match)) {
+                            cls = 'result-json';
+                        }
+                        return '<span class="' + cls + '">' + match + '</span>';
+                    });
+            }
+
+            // Demo functions - NOT needed in your real app!
+            async function testChat() {
+                const resultEl = document.getElementById('result');
+                resultEl.className = 'result-loading';
+                resultEl.innerHTML = '<span class="result-loading">⏳ Loading...</span>';
+                try {
+                    const result = await MySDK.chat('Hello! How are you?');
+                    resultEl.className = 'result-success';
+                    const jsonString = JSON.stringify(result, null, 2);
+                    resultEl.innerHTML = '<pre class="result-json">' + colorizeJSON(jsonString) + '</pre>';
+                } catch (error) {
+                    resultEl.className = 'result-error';
+                    if (error.message.includes('Call MySDK.init')) {
+                        resultEl.innerHTML = '<span class="result-error-title">❌ Error:</span> <span class="result-error">SDK not initialized. Please check your API key in the script tag.</span>';
+                    } else {
+                        resultEl.innerHTML = '<span class="result-error-title">❌ Error:</span> <span class="result-error">' + error.message + '</span>';
+                    }
+                }
+            }
+
+            async function testModels() {
+                const resultEl = document.getElementById('result');
+                resultEl.className = 'result-loading';
+                resultEl.innerHTML = '<span class="result-loading">⏳ Loading...</span>';
+                try {
+                    const result = await MySDK.models();
+                    resultEl.className = 'result-success';
+                    const jsonString = JSON.stringify(result, null, 2);
+                    resultEl.innerHTML = '<pre class="result-json">' + colorizeJSON(jsonString) + '</pre>';
+                } catch (error) {
+                    resultEl.className = 'result-error';
+                    if (error.message.includes('Call MySDK.init')) {
+                        resultEl.innerHTML = '<span class="result-error-title">❌ Error:</span> <span class="result-error">SDK not initialized. Please check your API key in the script tag.</span>';
+                    } else {
+                        resultEl.innerHTML = '<span class="result-error-title">❌ Error:</span> <span class="result-error">' + error.message + '</span>';
+                    }
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>
+

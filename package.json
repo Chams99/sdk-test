@@ -1,0 +1,29 @@
+{
+  "name": "my-web-sdk",
+  "version": "1.0.0",
+  "description": "A simple Google Analytics-style web SDK - one line integration",
+  "main": "dist/sdk.min.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/browser.ts --target browser --format iife --outfile ./dist/sdk.min.js --minify",
+    "dev": "bun build ./src/browser.ts --target browser --format iife --outfile ./dist/sdk.min.js --watch",
+    "serve": "bun serve.js",
+    "dev:server": "node dev-server.js",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "sdk",
+    "web",
+    "browser",
+    "analytics"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  }
+}
+
